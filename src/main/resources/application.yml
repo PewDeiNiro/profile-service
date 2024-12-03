@@ -1,2 +1,8 @@
 server:
   port: ${PORT:7503}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:10001/emss
+    username: msg_user
+    password: msg_user
