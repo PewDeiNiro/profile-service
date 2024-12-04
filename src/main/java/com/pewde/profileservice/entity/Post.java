@@ -29,11 +29,6 @@ public class Post {
     @Column(name = "text")
     private String text;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
-    @JoinColumn(name = "author_id")
-    private User author;
-
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private PostType type;

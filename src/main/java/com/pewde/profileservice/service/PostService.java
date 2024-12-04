@@ -4,6 +4,7 @@ import com.pewde.profileservice.entity.Post;
 import com.pewde.profileservice.entity.User;
 import com.pewde.profileservice.entity.Wall;
 import com.pewde.profileservice.enums.PostType;
+import com.pewde.profileservice.enums.WallType;
 import com.pewde.profileservice.exception.PostDoesNotBelongToUserException;
 import com.pewde.profileservice.exception.PostDoesNotExistsException;
 import com.pewde.profileservice.exception.UserDoesNotExistsException;
@@ -50,12 +51,12 @@ public class PostService {
         Wall wall = user.getWall();
         if (wall == null){
             wall = new Wall();
+            wall.setType(WallType.USER_WALL);
             user.setWall(wall);
         }
         Post post = new Post();
         post.setText(request.getText());
         post.setType(PostType.POST);
-        post.setAuthor(user);
         post.setWall(wall);
         post.setComments(new ArrayList<>());
         post.setLikes(new ArrayList<>());
@@ -66,7 +67,7 @@ public class PostService {
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
         Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        if (!post.getAuthor().equals(user)){
+        if (!post.getWall().getUser().equals(user)){
             throw new PostDoesNotBelongToUserException();
         }
         post.setText(request.getText());
@@ -77,13 +78,11 @@ public class PostService {
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
         Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
-        if (!post.getAuthor().equals(user)){
+        if (!post.getWall().getUser().equals(user)){
             throw new PostDoesNotBelongToUserException();
         }
         post.getWall().getPosts().remove(post);
-        post.getAuthor().getPosts().remove(post);
         post.setWall(null);
-        post.setAuthor(null);
         deleteReposts(post);
         postRepository.delete(post);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -95,9 +94,7 @@ public class PostService {
                 deleteReposts(repost);
             }
             repost.getWall().getPosts().remove(repost);
-            repost.getAuthor().getPosts().remove(repost);
             repost.setWall(null);
-            repost.setAuthor(null);
             postRepository.delete(repost);
         }
     }
@@ -123,10 +120,10 @@ public class PostService {
         Wall wall = user.getWall();
         if (wall == null){
             wall = new Wall();
+            wall.setType(WallType.USER_WALL);
             user.setWall(wall);
         }
         Post originalPost = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new), repost = new Post();
-        repost.setAuthor(user);
         repost.setType(PostType.REPOST);
         repost.setComments(new ArrayList<>());
         repost.setText(request.getText() == null ? "" : request.getText());
