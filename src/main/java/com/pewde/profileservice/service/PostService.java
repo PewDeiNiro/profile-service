@@ -3,6 +3,7 @@ package com.pewde.profileservice.service;
 import com.pewde.profileservice.entity.Post;
 import com.pewde.profileservice.entity.User;
 import com.pewde.profileservice.entity.Wall;
+import com.pewde.profileservice.enums.PostType;
 import com.pewde.profileservice.exception.PostDoesNotBelongToUserException;
 import com.pewde.profileservice.exception.PostDoesNotExistsException;
 import com.pewde.profileservice.exception.UserDoesNotExistsException;
@@ -10,10 +11,7 @@ import com.pewde.profileservice.exception.WallDoesNotExistsException;
 import com.pewde.profileservice.repository.PostRepository;
 import com.pewde.profileservice.repository.UserRepository;
 import com.pewde.profileservice.repository.WallRepository;
-import com.pewde.profileservice.request.CreatePostRequest;
-import com.pewde.profileservice.request.DeletePostRequest;
-import com.pewde.profileservice.request.EditPostRequest;
-import com.pewde.profileservice.request.RatePostRequest;
+import com.pewde.profileservice.request.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +54,7 @@ public class PostService {
         }
         Post post = new Post();
         post.setText(request.getText());
+        post.setType(PostType.POST);
         post.setAuthor(user);
         post.setWall(wall);
         post.setComments(new ArrayList<>());
@@ -85,8 +84,22 @@ public class PostService {
         post.getAuthor().getPosts().remove(post);
         post.setWall(null);
         post.setAuthor(null);
+        deleteReposts(post);
         postRepository.delete(post);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private void deleteReposts(Post post){
+        for (Post repost : post.getReposts()){
+            if (!repost.getReposts().isEmpty()){
+                deleteReposts(repost);
+            }
+            repost.getWall().getPosts().remove(repost);
+            repost.getAuthor().getPosts().remove(repost);
+            repost.setWall(null);
+            repost.setAuthor(null);
+            postRepository.delete(repost);
+        }
     }
 
     public Post ratePost(RatePostRequest request, String token){
@@ -101,6 +114,26 @@ public class PostService {
             likes.add(user);
         }
         return postRepository.saveAndFlush(post);
+    }
+
+    //TODO вынести логику создания постов в мапперы
+    public Post makeRepost(MakeRepostRequest request, String token){
+        User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
+//        AuthService.checkAuth(user, token);
+        Wall wall = user.getWall();
+        if (wall == null){
+            wall = new Wall();
+            user.setWall(wall);
+        }
+        Post originalPost = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new), repost = new Post();
+        repost.setAuthor(user);
+        repost.setType(PostType.REPOST);
+        repost.setComments(new ArrayList<>());
+        repost.setText(request.getText() == null ? "" : request.getText());
+        repost.setLikes(new ArrayList<>());
+        repost.setWall(wall);
+        repost.setOriginalPost(originalPost);
+        return postRepository.saveAndFlush(repost);
     }
 
 }

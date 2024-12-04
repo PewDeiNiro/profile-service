@@ -1,10 +1,7 @@
 package com.pewde.profileservice.controller;
 
 import com.pewde.profileservice.entity.Post;
-import com.pewde.profileservice.request.CreatePostRequest;
-import com.pewde.profileservice.request.DeletePostRequest;
-import com.pewde.profileservice.request.EditPostRequest;
-import com.pewde.profileservice.request.RatePostRequest;
+import com.pewde.profileservice.request.*;
 import com.pewde.profileservice.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,6 +67,13 @@ public class PostController {
     public Post ratePost(@RequestBody @Valid RatePostRequest request,
                          @RequestHeader("Authorization") String token) {
         return postService.ratePost(request, token);
+    }
+
+    @Operation(summary = "Сделать репост")
+    @PostMapping("/repost")
+    public Post makeRepost(@RequestBody @Valid MakeRepostRequest request,
+                           @RequestHeader("Authorization") String token) {
+        return postService.makeRepost(request, token);
     }
 
 }
