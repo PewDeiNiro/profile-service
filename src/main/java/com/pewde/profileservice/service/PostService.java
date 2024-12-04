@@ -13,11 +13,13 @@ import com.pewde.profileservice.repository.WallRepository;
 import com.pewde.profileservice.request.CreatePostRequest;
 import com.pewde.profileservice.request.DeletePostRequest;
 import com.pewde.profileservice.request.EditPostRequest;
+import com.pewde.profileservice.request.RatePostRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,6 +58,8 @@ public class PostService {
         post.setText(request.getText());
         post.setAuthor(user);
         post.setWall(wall);
+        post.setComments(new ArrayList<>());
+        post.setLikes(new ArrayList<>());
         return postRepository.saveAndFlush(post);
     }
 
@@ -83,6 +87,20 @@ public class PostService {
         post.setAuthor(null);
         postRepository.delete(post);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public Post ratePost(RatePostRequest request, String token){
+        User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
+//        AuthService.checkAuth(user, token);
+        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
+        List<User> likes = post.getLikes();
+        if (likes.contains(user)){
+            likes.remove(user);
+        }
+        else{
+            likes.add(user);
+        }
+        return postRepository.saveAndFlush(post);
     }
 
 }

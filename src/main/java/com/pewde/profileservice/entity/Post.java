@@ -44,4 +44,13 @@ public class Post {
     @JoinColumn(name = "wall_id")
     private Wall wall;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
+    @JoinTable(
+            schema = "posts",
+            name = "user_post_likes",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> likes;
+
 }

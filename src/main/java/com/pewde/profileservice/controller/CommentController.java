@@ -4,6 +4,7 @@ import com.pewde.profileservice.entity.Comment;
 import com.pewde.profileservice.request.CreateCommentRequest;
 import com.pewde.profileservice.request.DeleteCommentRequest;
 import com.pewde.profileservice.request.EditCommentRequest;
+import com.pewde.profileservice.request.RateCommentRequest;
 import com.pewde.profileservice.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,6 +63,13 @@ public class CommentController {
     public ResponseEntity<HttpStatus> deleteComment(@RequestBody @Valid DeleteCommentRequest request,
                                                     @RequestHeader("Authorization") String token){
         return commentService.deleteComment(request, token);
+    }
+
+    @Operation(summary = "Операция оценки нравится на комментарии и ее снятия с него")
+    @PostMapping("/rate")
+    public Comment rateComment(@RequestBody @Valid RateCommentRequest request,
+                               @RequestHeader("Authorization") String token){
+        return commentService.rateComment(request, token);
     }
 
 }

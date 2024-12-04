@@ -4,6 +4,7 @@ import com.pewde.profileservice.entity.Post;
 import com.pewde.profileservice.request.CreatePostRequest;
 import com.pewde.profileservice.request.DeletePostRequest;
 import com.pewde.profileservice.request.EditPostRequest;
+import com.pewde.profileservice.request.RatePostRequest;
 import com.pewde.profileservice.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,6 +63,13 @@ public class PostController {
     public ResponseEntity<HttpStatus> deletePost(@RequestBody @Valid DeletePostRequest request,
                                                  @RequestHeader("Authorization") String token) {
         return postService.deletePost(request, token);
+    }
+
+    @Operation(summary = "Операция оценки нравится на пост и ее снятия с него")
+    @PostMapping("/rate")
+    public Post ratePost(@RequestBody @Valid RatePostRequest request,
+                         @RequestHeader("Authorization") String token) {
+        return postService.ratePost(request, token);
     }
 
 }

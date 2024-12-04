@@ -13,11 +13,13 @@ import com.pewde.profileservice.repository.UserRepository;
 import com.pewde.profileservice.request.CreateCommentRequest;
 import com.pewde.profileservice.request.DeleteCommentRequest;
 import com.pewde.profileservice.request.EditCommentRequest;
+import com.pewde.profileservice.request.RateCommentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,6 +54,7 @@ public class CommentService {
         comment.setText(request.getText());
         comment.setPost(post);
         comment.setAuthor(user);
+        comment.setLikes(new ArrayList<>());
         return commentRepository.saveAndFlush(comment);
     }
 
@@ -78,6 +81,20 @@ public class CommentService {
         comment.setAuthor(null);
         commentRepository.delete(comment);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public Comment rateComment(RateCommentRequest request, String token){
+        User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
+//        AuthService.checkAuth(user, token);
+        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new);
+        List<User> likes = comment.getLikes();
+        if (likes.contains(user)){
+            likes.remove(user);
+        }
+        else{
+            likes.add(user);
+        }
+        return commentRepository.saveAndFlush(comment);
     }
 
 }

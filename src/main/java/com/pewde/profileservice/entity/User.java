@@ -40,9 +40,11 @@ public class User {
     )
     private List<User> blocklist;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "author")
     private List<Post> posts;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "wall_id", referencedColumnName = "id")
     private Wall wall;
