@@ -23,14 +23,14 @@ public class ProfileController {
 
     @Operation(summary = "Операция блокировки пользователя")
     @PostMapping("/block")
-    public User blockUser(@RequestBody @Valid BlockOrUnblockUserRequest request,
+    public User blockUser(@RequestBody BlockOrUnblockUserRequest request,
                           @RequestHeader("Authorization") String token){
         return profileService.blockUser(request, token);
     }
 
     @Operation(summary = "Операция разблокировки пользователя")
     @PostMapping("/unblock")
-    public User unblockUser(@RequestBody @Valid BlockOrUnblockUserRequest request,
+    public User unblockUser(@RequestBody BlockOrUnblockUserRequest request,
                             @RequestHeader("Authorization") String token){
         return profileService.unblockUser(request, token);
     }

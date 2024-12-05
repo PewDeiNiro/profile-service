@@ -57,14 +57,14 @@ public class CommentController {
 
     @Operation(summary = "Удаление комментария")
     @DeleteMapping("/delete")
-    public ResponseEntity<HttpStatus> deleteComment(@RequestBody @Valid DeleteCommentRequest request,
+    public ResponseEntity<HttpStatus> deleteComment(@RequestBody DeleteCommentRequest request,
                                                     @RequestHeader("Authorization") String token){
         return commentService.deleteComment(request, token);
     }
 
     @Operation(summary = "Операция оценки нравится на комментарии и ее снятия с него")
     @PostMapping("/rate")
-    public Comment rateComment(@RequestBody @Valid RateCommentRequest request,
+    public Comment rateComment(@RequestBody RateCommentRequest request,
                                @RequestHeader("Authorization") String token){
         return commentService.rateComment(request, token);
     }

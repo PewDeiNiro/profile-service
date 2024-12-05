@@ -57,21 +57,21 @@ public class PostController {
 
     @Operation(summary = "Удаление поста")
     @DeleteMapping("/delete")
-    public ResponseEntity<HttpStatus> deletePost(@RequestBody @Valid DeletePostRequest request,
+    public ResponseEntity<HttpStatus> deletePost(@RequestBody DeletePostRequest request,
                                                  @RequestHeader("Authorization") String token) {
         return postService.deletePost(request, token);
     }
 
     @Operation(summary = "Операция оценки нравится на пост и ее снятия с него")
     @PostMapping("/rate")
-    public Post ratePost(@RequestBody @Valid RatePostRequest request,
+    public Post ratePost(@RequestBody RatePostRequest request,
                          @RequestHeader("Authorization") String token) {
         return postService.ratePost(request, token);
     }
 
     @Operation(summary = "Сделать репост")
     @PostMapping("/repost")
-    public Post makeRepost(@RequestBody @Valid MakeRepostRequest request,
+    public Post makeRepost(@RequestBody MakeRepostRequest request,
                            @RequestHeader("Authorization") String token) {
         return postService.makeRepost(request, token);
     }
