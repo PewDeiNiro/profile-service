@@ -3,6 +3,7 @@ package com.pewde.profileservice.service;
 import com.pewde.profileservice.entity.Comment;
 import com.pewde.profileservice.entity.Post;
 import com.pewde.profileservice.entity.User;
+import com.pewde.profileservice.enums.CommentType;
 import com.pewde.profileservice.exception.CommentDoesNotBelongToUserException;
 import com.pewde.profileservice.exception.CommentDoesNotExistsException;
 import com.pewde.profileservice.exception.PostDoesNotExistsException;
@@ -10,10 +11,7 @@ import com.pewde.profileservice.exception.UserDoesNotExistsException;
 import com.pewde.profileservice.repository.CommentRepository;
 import com.pewde.profileservice.repository.PostRepository;
 import com.pewde.profileservice.repository.UserRepository;
-import com.pewde.profileservice.request.CreateCommentRequest;
-import com.pewde.profileservice.request.DeleteCommentRequest;
-import com.pewde.profileservice.request.EditCommentRequest;
-import com.pewde.profileservice.request.RateCommentRequest;
+import com.pewde.profileservice.request.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +52,9 @@ public class CommentService {
         comment.setText(request.getText());
         comment.setPost(post);
         comment.setAuthor(user);
+        comment.setType(CommentType.COMMENT);
         comment.setLikes(new ArrayList<>());
+        comment.setAnswers(new ArrayList<>());
         return commentRepository.saveAndFlush(comment);
     }
 
@@ -77,6 +77,11 @@ public class CommentService {
             throw new CommentDoesNotBelongToUserException();
         }
         comment.getPost().getComments().remove(comment);
+        comment.setParent(null);
+        for (Comment answer : comment.getAnswers()){
+            answer.setParent(null);
+            answer.setPost(comment.getPost());
+        }
         comment.setPost(null);
         comment.setAuthor(null);
         commentRepository.delete(comment);
@@ -96,5 +101,20 @@ public class CommentService {
         }
         return commentRepository.saveAndFlush(comment);
     }
+
+    public Comment answerComment(AnswerCommentRequest request, String token){
+        User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
+//        AuthService.checkAuth(user, token);
+        Comment parent = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new),
+                comment = new Comment();
+        comment.setText(request.getText());
+        comment.setAuthor(user);
+        comment.setType(CommentType.ANSWER);
+        comment.setParent(parent);
+        comment.setAnswers(new ArrayList<>());
+        comment.setLikes(new ArrayList<>());
+        return commentRepository.saveAndFlush(comment);
+    }
+
 
 }

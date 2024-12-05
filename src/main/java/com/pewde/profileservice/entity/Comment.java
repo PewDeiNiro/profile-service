@@ -1,6 +1,7 @@
 package com.pewde.profileservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pewde.profileservice.enums.CommentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +38,10 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
 
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private CommentType type;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private Date createdAt;
@@ -49,5 +54,13 @@ public class Comment {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> likes;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parent;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST}, mappedBy = "parent")
+    private List<Comment> answers;
 
 }

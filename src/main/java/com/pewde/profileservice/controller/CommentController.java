@@ -1,10 +1,7 @@
 package com.pewde.profileservice.controller;
 
 import com.pewde.profileservice.entity.Comment;
-import com.pewde.profileservice.request.CreateCommentRequest;
-import com.pewde.profileservice.request.DeleteCommentRequest;
-import com.pewde.profileservice.request.EditCommentRequest;
-import com.pewde.profileservice.request.RateCommentRequest;
+import com.pewde.profileservice.request.*;
 import com.pewde.profileservice.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,6 +67,13 @@ public class CommentController {
     public Comment rateComment(@RequestBody @Valid RateCommentRequest request,
                                @RequestHeader("Authorization") String token){
         return commentService.rateComment(request, token);
+    }
+
+    @Operation(summary = "Ответ на комментарий")
+    @PostMapping("/answer")
+    public Comment answerComment(@RequestBody @Valid AnswerCommentRequest request,
+                                 @RequestHeader("Authorization") String token){
+        return commentService.answerComment(request, token);
     }
 
 }
