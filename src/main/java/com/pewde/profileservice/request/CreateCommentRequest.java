@@ -15,7 +15,7 @@ public class CreateCommentRequest {
     private int userId;
 
     @Schema(description = "Уникальный идентификатор поста")
-    private int postId;
+    private int targetId;
 
     @NotEmpty
     @Schema(description = "Текст комментария")

@@ -14,7 +14,7 @@ public class MakeRepostRequest {
     private int userId;
 
     @Schema(description = "Уникальный идентификатор записи")
-    private int postId;
+    private int targetId;
 
     @Schema(description = "Текст поста")
     private String text;

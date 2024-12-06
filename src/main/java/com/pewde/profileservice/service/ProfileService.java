@@ -20,7 +20,7 @@ public class ProfileService {
 
     public User blockUser(BlockOrUnblockUserRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new),
-                block = userRepository.findById(request.getBlockId()).orElseThrow(UserDoesNotExistsException::new);
+                block = userRepository.findById(request.getTargetId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
         if (user.getBlocklist().contains(block)){
             throw new UserAlreadyBlockedException();
@@ -31,7 +31,7 @@ public class ProfileService {
 
     public User unblockUser(BlockOrUnblockUserRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new),
-                block = userRepository.findById(request.getBlockId()).orElseThrow(UserDoesNotExistsException::new);
+                block = userRepository.findById(request.getTargetId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
         if (!user.getBlocklist().contains(block)){
             throw new UserAlreadyUnblockedException();

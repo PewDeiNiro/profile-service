@@ -63,9 +63,9 @@ public class PostService {
         return postRepository.saveAndFlush(post);
     }
 
-    public Post editPost(EditPostRequest request, String token){
+    public Post editPost(EditTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
-        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
+        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
         if (!post.getWall().getUser().equals(user)){
             throw new PostDoesNotBelongToUserException();
@@ -74,10 +74,10 @@ public class PostService {
         return postRepository.saveAndFlush(post);
     }
 
-    public ResponseEntity<HttpStatus> deletePost(DeletePostRequest request, String token){
+    public ResponseEntity<HttpStatus> deletePost(DeleteTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
+        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
         if (!post.getWall().getUser().equals(user)){
             throw new PostDoesNotBelongToUserException();
         }
@@ -99,10 +99,10 @@ public class PostService {
         }
     }
 
-    public Post ratePost(RatePostRequest request, String token){
+    public Post ratePost(RateTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
+        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
         List<User> likes = post.getLikes();
         if (likes.contains(user)){
             likes.remove(user);
@@ -123,7 +123,7 @@ public class PostService {
             wall.setType(WallType.USER_WALL);
             user.setWall(wall);
         }
-        Post originalPost = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new), repost = new Post();
+        Post originalPost = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new), repost = new Post();
         repost.setType(PostType.REPOST);
         repost.setComments(new ArrayList<>());
         repost.setText(request.getText() == null ? "" : request.getText());

@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditCommentRequest {
+public class EditTargetRequest {
 
     @Schema(description = "Уникальный идентификатор пользователя")
     private int userId;
 
     @Schema(description = "Уникальный идентификатор комментария")
-    private int commentId;
+    private int targetId;
 
     @NotEmpty
     @Schema(description = "Текст комментария")

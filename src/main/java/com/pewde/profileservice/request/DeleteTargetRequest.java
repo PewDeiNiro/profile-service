@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RatePostRequest {
+public class DeleteTargetRequest {
 
     @Schema(description = "Уникальный идентификатор пользователя")
     private int userId;
 
     @Schema(description = "Уникальный идентификатор поста")
-    private int postId;
+    private int targetId;
 
 }

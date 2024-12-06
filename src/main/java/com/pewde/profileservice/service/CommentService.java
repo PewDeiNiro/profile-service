@@ -47,7 +47,7 @@ public class CommentService {
     public Comment createComment(CreateCommentRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostDoesNotExistsException::new);
+        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
         Comment comment = new Comment();
         comment.setText(request.getText());
         comment.setPost(post);
@@ -58,10 +58,10 @@ public class CommentService {
         return commentRepository.saveAndFlush(comment);
     }
 
-    public Comment editComment(EditCommentRequest request, String token){
+    public Comment editComment(EditTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new);
+        Comment comment = commentRepository.findById(request.getTargetId()).orElseThrow(CommentDoesNotExistsException::new);
         if (!comment.getAuthor().equals(user)) {
             throw new CommentDoesNotBelongToUserException();
         }
@@ -69,10 +69,10 @@ public class CommentService {
         return commentRepository.saveAndFlush(comment);
     }
 
-    public ResponseEntity<HttpStatus> deleteComment(DeleteCommentRequest request, String token){
+    public ResponseEntity<HttpStatus> deleteComment(DeleteTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new);
+        Comment comment = commentRepository.findById(request.getTargetId()).orElseThrow(CommentDoesNotExistsException::new);
         if (!comment.getAuthor().equals(user)) {
             throw new CommentDoesNotBelongToUserException();
         }
@@ -88,10 +88,10 @@ public class CommentService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public Comment rateComment(RateCommentRequest request, String token){
+    public Comment rateComment(RateTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new);
+        Comment comment = commentRepository.findById(request.getTargetId()).orElseThrow(CommentDoesNotExistsException::new);
         List<User> likes = comment.getLikes();
         if (likes.contains(user)){
             likes.remove(user);
@@ -105,7 +105,7 @@ public class CommentService {
     public Comment answerComment(AnswerCommentRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Comment parent = commentRepository.findById(request.getCommentId()).orElseThrow(CommentDoesNotExistsException::new),
+        Comment parent = commentRepository.findById(request.getTargetId()).orElseThrow(CommentDoesNotExistsException::new),
                 comment = new Comment();
         comment.setText(request.getText());
         comment.setAuthor(user);

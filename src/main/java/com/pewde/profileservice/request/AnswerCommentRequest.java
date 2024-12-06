@@ -15,7 +15,7 @@ public class AnswerCommentRequest {
     private int userId;
 
     @Schema(description = "Уникальный идентификатор комментария")
-    private int commentId;
+    private int targetId;
 
     @NotEmpty
     @Schema(description = "Текст ответа")

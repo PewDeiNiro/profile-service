@@ -14,6 +14,6 @@ public class BlockOrUnblockUserRequest {
     private int userId;
 
     @Schema(description = "Уникальный идентификатор пользователя, над которым производится операция")
-    private int blockId;
+    private int targetId;
 
 }
