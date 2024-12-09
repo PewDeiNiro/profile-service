@@ -77,10 +77,19 @@ public class PostService {
 
     public Post editPost(EditTargetRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
-        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        if (!post.getWall().getUser().equals(user)){
-            throw new PostDoesNotBelongToUserException();
+        Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
+        Wall wall = post.getWall();
+        if (wall.getType().equals(WallType.GROUP_WALL)){
+            Group group = groupRepository.findByWall(wall).orElseThrow(GroupDoesNotExistsException::new);
+            if (!group.getAdmins().contains(user)){
+                throw new UserDoesNotAdminException();
+            }
+        }
+        else{
+            if (!wall.getUser().equals(user)){
+                throw new PostDoesNotBelongToUserException();
+            }
         }
         post.setText(request.getText());
         return postRepository.saveAndFlush(post);
@@ -90,10 +99,19 @@ public class PostService {
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
         Post post = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new);
-        if (!post.getWall().getUser().equals(user)){
-            throw new PostDoesNotBelongToUserException();
+        Wall wall = post.getWall();
+        if (wall.getType().equals(WallType.GROUP_WALL)){
+            Group group = groupRepository.findByWall(wall).orElseThrow(GroupDoesNotExistsException::new);
+            if (!group.getAdmins().contains(user)){
+                throw new UserDoesNotAdminException();
+            }
         }
-        post.getWall().getPosts().remove(post);
+        else{
+            if (!wall.getUser().equals(user)){
+                throw new PostDoesNotBelongToUserException();
+            }
+        }
+        wall.getPosts().remove(post);
         post.setWall(null);
         deleteReposts(post);
         postRepository.delete(post);
