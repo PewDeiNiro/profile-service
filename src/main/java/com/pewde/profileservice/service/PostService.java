@@ -1,14 +1,13 @@
 package com.pewde.profileservice.service;
 
+import com.pewde.profileservice.entity.Group;
 import com.pewde.profileservice.entity.Post;
 import com.pewde.profileservice.entity.User;
 import com.pewde.profileservice.entity.Wall;
 import com.pewde.profileservice.enums.PostType;
 import com.pewde.profileservice.enums.WallType;
-import com.pewde.profileservice.exception.PostDoesNotBelongToUserException;
-import com.pewde.profileservice.exception.PostDoesNotExistsException;
-import com.pewde.profileservice.exception.UserDoesNotExistsException;
-import com.pewde.profileservice.exception.WallDoesNotExistsException;
+import com.pewde.profileservice.exception.*;
+import com.pewde.profileservice.repository.GroupRepository;
 import com.pewde.profileservice.repository.PostRepository;
 import com.pewde.profileservice.repository.UserRepository;
 import com.pewde.profileservice.repository.WallRepository;
@@ -33,6 +32,9 @@ public class PostService {
     @Autowired
     private WallRepository wallRepository;
 
+    @Autowired
+    private GroupRepository groupRepository;
+
     public Post getPostById(int id){
         return postRepository.findById(id).orElseThrow(PostDoesNotExistsException::new);
     }
@@ -48,18 +50,28 @@ public class PostService {
     public Post createPost(CreatePostRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Wall wall = user.getWall();
-        if (wall == null){
-            wall = new Wall();
-            wall.setType(WallType.USER_WALL);
-            user.setWall(wall);
+        Wall wall;
+        if (request.getWallId() == -1){
+            wall = user.getWall();
+            if (wall == null){
+                wall = new Wall();
+                wall.setType(WallType.USER_WALL);
+                user.setWall(wall);
+            }
+        }
+        else{
+            wall = wallRepository.findById(request.getWallId()).orElseThrow(WallDoesNotExistsException::new);
+        }
+        if (wall.getType().equals(WallType.GROUP_WALL)){
+            Group group = groupRepository.findByWall(wall).orElseThrow(GroupDoesNotExistsException::new);
+            if (!group.getAdmins().contains(user)){
+                throw new UserDoesNotAdminException();
+            }
         }
         Post post = new Post();
         post.setText(request.getText());
         post.setType(PostType.POST);
         post.setWall(wall);
-        post.setComments(new ArrayList<>());
-        post.setLikes(new ArrayList<>());
         return postRepository.saveAndFlush(post);
     }
 

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class Post {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "originalPost")
-    private List<Post> reposts;
+    private List<Post> reposts = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
     @JoinTable(
@@ -61,6 +62,6 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> likes;
+    private List<User> likes = new ArrayList<>();
 
 }
