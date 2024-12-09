@@ -147,17 +147,28 @@ public class PostService {
     public Post makeRepost(MakeRepostRequest request, String token){
         User user = userRepository.findById(request.getUserId()).orElseThrow(UserDoesNotExistsException::new);
 //        AuthService.checkAuth(user, token);
-        Wall wall = user.getWall();
-        if (wall == null){
-            wall = new Wall();
-            wall.setType(WallType.USER_WALL);
-            user.setWall(wall);
+        Wall wall;
+        if (request.getWallId() == -1){
+            wall = user.getWall();
+            if (wall == null){
+                wall = new Wall();
+                wall.setType(WallType.USER_WALL);
+                user.setWall(wall);
+            }
         }
-        Post originalPost = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new), repost = new Post();
+        else{
+            wall = wallRepository.findById(request.getWallId()).orElseThrow(WallDoesNotExistsException::new);
+        }
+        if (wall.getType().equals(WallType.GROUP_WALL)){
+            Group group = groupRepository.findByWall(wall).orElseThrow(GroupDoesNotExistsException::new);
+            if (!group.getAdmins().contains(user)){
+                throw new UserDoesNotAdminException();
+            }
+        }
+        Post originalPost = postRepository.findById(request.getTargetId()).orElseThrow(PostDoesNotExistsException::new),
+                repost = new Post();
         repost.setType(PostType.REPOST);
-        repost.setComments(new ArrayList<>());
         repost.setText(request.getText() == null ? "" : request.getText());
-        repost.setLikes(new ArrayList<>());
         repost.setWall(wall);
         repost.setOriginalPost(originalPost);
         return postRepository.saveAndFlush(repost);

@@ -35,7 +35,7 @@ public class Post {
     private PostType type;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "post")
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @Column(name = "created_at")
     @CreationTimestamp
